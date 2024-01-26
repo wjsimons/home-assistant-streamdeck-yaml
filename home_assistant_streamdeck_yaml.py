@@ -1220,7 +1220,7 @@ def _states(
     if with_unit:
         unit = entity_state.get("attributes", {}).get("unit_of_measurement")
         if unit:
-            state += f" {unit}"
+            state = f"{state} {unit}"
     return state
 
 
