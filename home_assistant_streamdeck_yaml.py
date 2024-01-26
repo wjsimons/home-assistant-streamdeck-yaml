@@ -36,6 +36,8 @@ from rich.console import Console
 from rich.table import Table
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.ImageHelpers import PILHelper
+from StreamDeck.Devices.StreamDeck import DialEventType, TouchscreenEventType
+
 
 if TYPE_CHECKING:
     from collections.abc import Coroutine
@@ -204,6 +206,8 @@ class Button(BaseModel, extra="forbid"):  # type: ignore[call-arg]
     )
 
     _timer: AsyncDelayedCallback | None = PrivateAttr(None)
+    _auto_off_timer: AsyncDelayedCallback | None = PrivateAttr(None)
+
 
     @classmethod
     def from_yaml(cls: type[Button], yaml_str: str) -> Button:
@@ -580,6 +584,11 @@ class Config(BaseModel):
         default=False,
         description="If True, the configuration YAML file will automatically"
         " be reloaded when it is modified.",
+    )
+    auto_off: int = Field(
+        default=0,
+        description="If > 0, the Stream Deck will automatically turn off"
+        " after `auto_off` seconds.",
     )
     _current_page_index: int = PrivateAttr(default=0)
     _is_on: bool = PrivateAttr(default=True)
@@ -1524,6 +1533,10 @@ async def _handle_key_press(
     button: Button,
     deck: StreamDeck,
 ) -> None:
+    if config._auto_off_timer.is_running():
+        config._auto_off_timer.cancel()
+        config._auto_off_timer.start() # cancel and restart
+        console.log("auto_off timer restarted.")
     if not config._is_on:
         turn_on(config, deck, complete_state)
         return
@@ -1576,6 +1589,12 @@ async def _handle_key_press(
     if config._detached_page:
         config._detached_page = None
         update_all()
+  
+    if config.auto_off:
+        async def cb() -> None:
+            turn_off(config, deck); #turn off when counter is expired
+        config._auto_off_timer = AsyncDelayedCallback(delay=config.auto_off, callback=cb)
+        config._auto_off_timer.start()
 
 
 def _on_press_callback(
