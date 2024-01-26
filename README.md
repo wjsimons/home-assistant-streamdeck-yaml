@@ -293,6 +293,7 @@ Each YAML config can take the following configuration
 | `state_entity_id` | The entity ID to sync display state with. For example `input_boolean.streamdeck` or `binary_sensor.anyone_home`.                                                                                                                                                                          | `None`    | `Optional[str]` |
 | `brightness`      | The default brightness of the Stream Deck (0-100).                                                                                                                                                                                                                                        | `100`     | `int`           |
 | `auto_reload`     | If True, the configuration YAML file will automatically be reloaded when it is modified.                                                                                                                                                                                                  | `False`   | `bool`          |
+| `auto_off`        | If > 0, the Stream Deck will automatically turn off after `auto_off` seconds.                                                                                                                                                                                                             | `0`       | `int`           |
 
 <!-- OUTPUT:END -->
 
