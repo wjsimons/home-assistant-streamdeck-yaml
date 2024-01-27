@@ -206,7 +206,6 @@ class Button(BaseModel, extra="forbid"):  # type: ignore[call-arg]
     )
 
     _timer: AsyncDelayedCallback | None = PrivateAttr(None)
-    _auto_off_timer: AsyncDelayedCallback | None = PrivateAttr(None)
 
 
     @classmethod
@@ -595,6 +594,8 @@ class Config(BaseModel):
     _detached_page: Page | None = PrivateAttr(default=None)
     _configuration_file: Path | None = PrivateAttr(default=None)
     _include_files: list[Path] = PrivateAttr(default_factory=list)
+    _auto_off_timer: AsyncDelayedCallback | None = PrivateAttr(None)
+
 
     @classmethod
     def load(cls: type[Config], fname: Path) -> Config:
