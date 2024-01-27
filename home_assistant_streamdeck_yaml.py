@@ -1534,10 +1534,11 @@ async def _handle_key_press(
     button: Button,
     deck: StreamDeck,
 ) -> None:
-    if config._auto_off_timer.is_running():
-        config._auto_off_timer.cancel()
-        config._auto_off_timer.start() # cancel and restart
-        console.log("auto_off timer restarted.")
+    if config.auto_off:
+        if config._auto_off_timer.is_running():
+            config._auto_off_timer.cancel()
+            config._auto_off_timer.start() # cancel and restart
+            console.log("auto_off timer restarted.")
     if not config._is_on:
         turn_on(config, deck, complete_state)
         return
